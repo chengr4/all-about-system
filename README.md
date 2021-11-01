@@ -13,7 +13,7 @@
 
 因解決每個 device 所需資料不一樣而出現的 pattern
 
-[](https://i.imgur.com/Jk5cpwL.png)
+![](https://i.imgur.com/Jk5cpwL.png)
 
 > One backend per User Experience: 一種裝置一種 Server
 
