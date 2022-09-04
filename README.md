@@ -19,3 +19,6 @@
 
 > One backend per User Experience: 一種裝置一種 Server
 
+## Command Patterns
+
+- Smarthome 
