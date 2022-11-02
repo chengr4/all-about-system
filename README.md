@@ -1,24 +1,12 @@
-# Design Patterns
+# All about System
 
-## SOLID
+- [Design Patterns](./design-pattern/)
 
-## API Gateway Pattern
 
-![](https://i.imgur.com/APVJF7E.png)
+## OS
 
-1. 有 reverse proxy
-2. Decouple: 減低前後端相依程度
-3. requests aggregation: 將 client 發送的 requests 在 gatway 做聚合
-4. Extract common logics: 後端服務間通用的邏輯在 gateway 做處理
+GO TO: [all-about-OS](https://github.com/chengr4/all-about-OS)
 
-## Backend For Frontend Pattern (BFF)
+## References
 
-因解決每個 device 所需資料不一樣而出現的 pattern
-
-![](https://i.imgur.com/Jk5cpwL.png)
-
-> One backend per User Experience: 一種裝置一種 Server
-
-## Command Patterns
-
-- Smarthome 
+- [馬克;IT 鐵人賽 2019](https://mark-lin.com/tags/it-%E9%90%B5%E4%BA%BA%E8%B3%BD-2019/)
