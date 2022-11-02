@@ -2,6 +2,22 @@
 
 - [Design Patterns](./design-pattern/)
 
+## How to build a good system?
+
+```mermaid
+flowchart TD
+  id1["Optimize the single machine's performance"]
+  id2["Application"]
+  id3["Database"]
+  id4["Algorithm"]
+  id5["I/O"]
+
+  id1 --> id2
+  id1 --> id3
+  id2 -->|right| id4
+  id2 -->|right| id5
+```
+
 
 ## OS
 
