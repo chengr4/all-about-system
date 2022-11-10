@@ -2,6 +2,18 @@
 
 ## SOLID
 
+- Five design principles intende to make OO designs more understandable, flexable and maintainable
+
+### Open/Closed Principle
+
+- Software entities (classes, modules, functions, etc.) should be open for extension, but closed for modification
+  - Open: We are able to add new things without changing the code inside the function
+  - Close: The code changed outside the function should not affect the code inside the function (the code in function should not be modified)
+
+#### When to use
+
+1. when seeing huge `if statement` or `switch`
+
 ## API Gateway Pattern
 
 ![](https://i.imgur.com/APVJF7E.png)
@@ -22,3 +34,7 @@
 ## Command Patterns
 
 - Smarthome 
+
+## References
+
+- [Open/Closed Principle Explained - SOLID Design Principles (2019.12)](https://youtu.be/-ptMtJAdj40)
