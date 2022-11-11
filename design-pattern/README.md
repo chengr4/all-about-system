@@ -4,6 +4,12 @@
 
 - Five design principles intende to make OO designs more understandable, flexable and maintainable
 
+### Single Responsibility Principle
+
+- Every class, module, function should only have one single responsibility
+
+Eg. If the class has `logMsg()` and `trackMsg()` (two responsibilities) => move `logMsg()` out of the class and import it from the place you set it.
+
 ### Open/Closed Principle
 
 - Software entities (classes, modules, functions, etc.) should be open for extension, but closed for modification
@@ -37,4 +43,5 @@
 
 ## References
 
+- [Single Responsibility Principle Explained - SOLID Design Principles (2019.12)](https://youtu.be/-ptMtJAdj40)
 - [Open/Closed Principle Explained - SOLID Design Principles (2019.12)](https://youtu.be/-ptMtJAdj40)
