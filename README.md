@@ -14,8 +14,8 @@ flowchart TD
 
   id1 --> id2
   id1 --> id3
-  id2 -->|right| id4
-  id2 -->|right| id5
+  id2 -->|correct| id4
+  id2 -->|correct| id5
 ```
 
 
