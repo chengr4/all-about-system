@@ -20,6 +20,8 @@ Eg. If the class has `logMsg()` and `trackMsg()` (two responsibilities) => move 
 
 ### "I"nterface Segregation Principle
 
+### "D"ependency Inversion Principle
+
 #### When to use
 
 1. when seeing huge `if statement` or `switch`
