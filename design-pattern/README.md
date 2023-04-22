@@ -1,5 +1,7 @@
 # Design Patterns
 
+- [Strategy Pattern](#strategy-pattern)
+
 ## SOLID
 
 - Five design principles intende to make OO designs more understandable, flexable and maintainable
@@ -42,6 +44,10 @@ Eg. If the class has `logMsg()` and `trackMsg()` (two responsibilities) => move 
 ![](https://i.imgur.com/Jk5cpwL.png)
 
 > One backend per User Experience: 一種裝置一種 Server
+
+## Strategy Pattern
+
+- Common used in web backend
 
 ## Command Patterns
 
