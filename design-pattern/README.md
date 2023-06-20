@@ -2,6 +2,14 @@
 
 - [Strategy Pattern](#strategy-pattern)
 
+```mermaid
+flowchart TD
+  dp["Design Pattern"] --> solid["SOLID"]
+  dp --> sp["Strategy Pattern"]
+  dp --> di["Dependency Injection"]
+
+```
+
 ## SOLID
 
 - Five design principles intende to make OO designs more understandable, flexable and maintainable
