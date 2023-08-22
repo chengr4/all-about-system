@@ -1,6 +1,7 @@
 # All about System
 
 - [Design Patterns](./design-pattern/)
+- [OOP SOLID Principle](./solid/)
 
 ## How to build a good system?
 
