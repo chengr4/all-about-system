@@ -1,0 +1,8 @@
+{
+  "compilerOptions": {
+    "strictPropertyInitialization": false
+  },
+  "tasks": {
+    "dev": "deno run --watch main.ts"
+  }
+}

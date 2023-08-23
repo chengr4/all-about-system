@@ -16,6 +16,14 @@ Eg. If the class has `logMsg()` and `trackMsg()` (two responsibilities) => move 
 
 ## "L"iskov Substitution Principle
 
+Subtypes must be substitutable (without breaking the program) for their base (parent) types
+
+### Examples
+
+A square is not a subclass of a rectangle (See examples of he code)
+
+> It might not be intuitive, but it applies to OOP
+
 ## "I"nterface Segregation Principle
 
 ## "D"ependency Inversion Principle
