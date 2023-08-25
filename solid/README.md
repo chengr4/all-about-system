@@ -18,11 +18,11 @@ Eg. If the class has `logMsg()` and `trackMsg()` (two responsibilities) => move 
 
 Subtypes must be substitutable (without breaking the program) for their base (parent) types
 
-### Examples
-
-A square is not a subclass of a rectangle (See examples of he code)
+Eg. A square should not be a subclass of a rectangle (See examples of he code)
 
 > It might not be intuitive, but it applies to OOP
+
+If we make a square a subclass of a rectangle, we will have to change the code inside the rectangle class to make it work for the square class. This is a violation of the Liskov Substitution Principle.
 
 ## "I"nterface Segregation Principle
 
