@@ -9,6 +9,10 @@ flowchart TD
   dp --> di["Dependency Injection"]
 ```
 
+## Repository Pattern
+
+管理物件的生成與儲存
+
 ## API Gateway Pattern
 
 ![](https://i.imgur.com/APVJF7E.png)
