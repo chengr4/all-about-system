@@ -1,6 +1,26 @@
+# Computer Architecture
+
+## RISC
+
+
+
+## CISC
+
+### Limitations of CISC
+
+One issue with trying to improve a specific architecture is that tools and systems have already been developed which use the previous version.  Making significant changes may interfere with the functionality of old software systems. This expectation of backwards compatibility is quite pervasive, and maintenance of legacy systemsLinks to an external site. is an exceedingly common field in the Computer Science discipline.
+
+As an architecture evolves, the developer must choose to either deal with out-of-date architecture components intermixing with their newer, streamlined techniques to allow backwards compatibility, or abandon (obsolete, deprecate) some parts of the older architecture. This can put companies and engineers into a conundrum because they want the improvements from the new system, but many of their systems will cease to function if they are dependent on those deprecated capabilities, and they’ll have to rework and refactor to compensate. There is, of course, another choice - to move to an entirely new architecture whose strengths meet the needs of the system.
+
+## QA
+
+### Why to learn Postfix?
+
+- it helps understand how the Intel IA-32 Floating Point Unit (FPU) works
+
 ## Primary Architecture Components
 
-> The key concept of the Von Neumann architecture is that programs are stored in memory. 
+> The key concept of the Von Neumann architecture is that programs are stored in memory.
 
 ### CPU
 
@@ -83,8 +103,24 @@ For example, to read from memory you would place the memory address to be read f
 5. Execute the instruction.
 6. Store resultant operands.
 
+## Endianness
+
+簡單來說就是 bit 的儲存方式，有兩種：
+    1. Big-endian: Most significant byte is stored at the smallest memory address
+    2. Little-endian: Least significant byte is stored at the smallest memory address
+
+> 注意：當大小超過 1 byte 時，才會有 endianness 的問題。
+
+- Benefits of little-endian byte ordering
+    - Simpler typecasting, quick even/odd parity checks, arithmetic function optimization.
+
 ## References
 
 - [Writing Nintendo (NES) Games with Assembly](https://media.oregonstate.edu/media/t/0_av1m2m6j)
 - [Shenzhen I/O](https://www.zachtronics.com/shenzhen-io/)
 - [Zachtronics](https://www.zachtronics.com/)
+
+### FPU
+
+- [masmforum.com SimplyFPU Tutorial by Raymond Filiatreault](https://www.website.masmforum.com/tutorials/fptute/)
+- [Online Postfix Calculator](https://devonsmith.github.io/cs460/hw2/demo/)
