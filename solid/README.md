@@ -4,6 +4,10 @@
 
 ## "S"ingle Responsibility Principle
 
+> TODO: FIX the explanation
+
+> note: not component level of SRP
+
 - Every class, module, function should only have one single responsibility
 
 Eg. If the class has `logMsg()` and `trackMsg()` (two responsibilities) => move `logMsg()` out of the class and import it from the place you set it.
