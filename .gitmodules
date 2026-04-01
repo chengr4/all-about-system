@@ -1,0 +1,12 @@
+[submodule "distributed-system/memberlist"]
+	path = distributed-system/memberlist
+	url = https://github.com/hashicorp/memberlist
+[submodule "distributed-system/openraft"]
+	path = distributed-system/openraft
+	url = https://github.com/databendlabs/openraft
+[submodule "distributed-system/rockraft"]
+	path = distributed-system/rockraft
+	url = https://github.com/lichuang/rockraft
+[submodule "distributed-system/tikv"]
+	path = distributed-system/tikv
+	url = https://github.com/tikv/tikv
