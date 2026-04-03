@@ -1,14 +1,5 @@
 # Design Patterns
 
-- [Strategy Pattern](#strategy-pattern)
-
-```mermaid
-flowchart TD
-  dp["Design Pattern"]
-  dp --> sp["Strategy Pattern"]
-  dp --> di["Dependency Injection"]
-```
-
 ## Repository Pattern
 
 管理物件的生成與儲存
