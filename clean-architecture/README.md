@@ -1,11 +1,16 @@
 # Clean Architecture
 
+
 ## Important Concepts
 
+- Good architecture are centered on use cases (purpose)
 - The business rules do not need to know about the database, GUI
 - All the business rules need to know is that there is a set of functions that can be used to retrieve and store data
 - The IO is irrelevant
-- The definition of the data structure is on the calling side of the boundary
+- We want source code dependencies to be decoupled from data flow and coupled to level
+- Policies that change for the same reasons and at the same times are grouped together by SRP and CCP.
+- The low-level components should be plugins to the high-level components.
+- The presenter, views and controllers all belong in the interface adapters layer (chatper 22)
 
 Business rules change at different times and for different reasons than dependency injection framework so **there should be a boundary between them.** E.g.
 
@@ -53,3 +58,6 @@ public class InvoiceController {
 
 ## Polymorphism
 
+## Important Chapters
+
+- Chapter 23: Presenters and Humble Objects
