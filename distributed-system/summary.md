@@ -1,6 +1,54 @@
 # Summary
 
+## 20260402
+
+> #3PC #2PC #NonBlocking #PreCommit #FailureAnalysis
+
+1. 3-Phase Commit (3PC) 的演進動機:
+    *   **解決 2PC 的阻塞 (Blocking) 問題**: 在 2PC 中，若協調者與參與者同時故障，留在 `READY` 的節點會因不確定狀態而卡死。
+    *   **目標**: 成為一個**非阻塞 (Non-blocking)** 協議，讓參與者在超時後能透過互相詢問達成共識。
+
+2. 3PC 的三個階段:
+    *   **Can-Commit (Voting Phase)**: 詢問意願，確認節點是否具備執行能力。
+    *   **Pre-Commit (Preparation Phase)**: **核心改進**。當全員同意後，進入此階段作為緩衝，代表「即將提交」的共識已達成。
+    *   **Do-Commit (Commit Phase)**: 執行最終的實體提交。
+
+3. 3PC 的核心特性與規則:
+    *   **狀態同步性 (One-State Rule)**: 任意兩個參與者的狀態落差不會超過一個階段（例如：不可能有人在 `ABORT` 而有人在 `PRECOMMIT`）。
+    *   **PRECOMMIT 作為提交證明 (Commit Certificate)**: 只要有任何一個節點進入 `PRECOMMIT`，即證明當初「投票階段」是全員通過的。
+
+4. 故障處理邏輯 (Failure Analysis):
+    *   **混雜狀態處理**: 當協調者故障，參與者互相詢問發現狀態混雜（`READY` 與 `PRECOMMIT` 同時存在）時，**`PRECOMMIT` 具有優先權**，系統會走向 `COMMIT`。
+    *   **安全撤銷 (Safe Abort)**: 只有當**所有**能連線的參與者都還在 `READY` 狀態（代表沒人收到過 Pre-commit 指令）時，大家才會一起選擇 `ABORT` 以保證安全性。
+    *   **超時自動化**: 
+        *   在 `PRECOMMIT` 狀態超時：自動轉向 `COMMIT`（因為有證據顯示投票已過）。
+        *   在 `READY` 狀態超時：詢問他人後，若無 `PRECOMMIT` 證據則轉向 `ABORT`。
+
+---
+
+> #Commit #Persistence #2PC #ClockSkew #ClockShift #MDR #ExternalSync #CristiansAlgorithm
+
+1. **Commit 與持久性 (Persistence)**
+    *   **邏輯不可逆點**：Commit 代表共識已達成。在 Raft 等系統中，過半數複製即為邏輯 Commit，即便尚未落盤。
+    *   **硬碟是最終防線**：一致性在系統重啟後的存續依賴於持久化儲存（如 WAL）。沒有 Drive 的保證，一致性僅存在於運行期間。
+
+2. **2PC 的阻塞與一致性風險**
+    *   **為何不能隨意 Abort**：在 2PC 中，若參與者 $P_i$ 已 Commit 但隨後與協調者一同掛掉，剩餘節點不可自行 Abort，否則會違反原子性（有人做有人沒做）。
+    *   **阻塞特性**：這是 2PC 的致命傷，系統必須等待故障節點恢復以確認最終狀態，除非使用 Paxos/Raft 等多數決協議來提升可用性。
+
+3. **時鐘偏斜 (Skew) vs. 偏移 (Shift)**
+    *   **Clock Skew (偏斜)**：描述時鐘跑的「速度」快慢（頻率差異），會隨時間累積誤差。
+    *   **Clock Shift/Offset (偏移)**：描述特定瞬間兩個時鐘「讀值」的絕對差距。
+    *   **MDR (Maximum Drift Rate)**：硬體天生的最大漂移率（ppm），是計算分散式租約（Lease）安全邊界與 TrueTime 不確定性區間 ($\epsilon$) 的核心參數。
+
+4. **外部同步 (External Synchronization)**
+    *   **目標**：將節點時間對齊外部權威源（UTC/GPS/原子鐘），確保跨系統的因果排序。
+    *   **Cristian's Algorithm**：最基礎的同步演算法，透過 $RTT$ 估算時間：$T_{new} = T_{server} + RTT/2$，最大誤差約為 $\pm RTT/2$。
+    *   **現代方案**：NTP（軟體級、毫秒精度）與 PTP（硬體級、微秒精度）。
+
 ## 20260331
+
+Tags: #BoundedTime #LogicalClock #FencingToken #CAP #BFT #2PC #CPvsAP
 
 1. 有界時間 (Bounded Time):
     *   定義操作、延遲或時鐘漂移存在預定義上限 ($T$)。
@@ -23,4 +71,3 @@
         *   **Case 2 (參與者 INIT 超時):** 決定 Abort。既然還沒投過票，直接退出是安全的。
         *   **Case 3 (參與者 READY 超時):** 最棘手。參與者已投 Yes 但等不到決策，不可擅自決定（否則可能與他人不一致）。需啟動終止協議詢問他人狀態，若大家都處於 READY 且協調者掛了，會造成系統**同步阻塞**。
     *   **CAP 歸類:** 2PC 是典型的 **CP 系統**。它優先保證原子一致性，但在發生故障（如協調者當機或網路分區）時會犧牲可用性（A）。相較之下，Raft/Paxos 雖也是 CP，但透過「多數決 (Quorum)」顯著提升了可用性與容錯能力。
-

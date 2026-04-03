@@ -5,5 +5,5 @@
 
 ## English to zh-TW
 
-- Concurrency: 並行: 
-
+- Concurrency: 並行 
+- Code: 程式碼
