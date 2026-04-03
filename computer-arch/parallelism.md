@@ -13,7 +13,7 @@ Two levels of parallelism in **Hardware**:
 
 ### Pipelining
 
-Hardware must provide separate units that are each capable of processing some part of an instruction, effectively breaking the Instruction Execution Cycle into its component parts (Fetch, Decode, Operand Fetch, Execute, Store Result) and then processing these parts individually.
+See [Pipelining](pipelining.md)
 
 ### Caching
 

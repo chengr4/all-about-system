@@ -1,22 +1,11 @@
 # Computer Architecture
 
-## RISC
+```asm
+add a, b, c
+```
 
-
-
-## CISC
-
-### Limitations of CISC
-
-One issue with trying to improve a specific architecture is that tools and systems have already been developed which use the previous version.  Making significant changes may interfere with the functionality of old software systems. This expectation of backwards compatibility is quite pervasive, and maintenance of legacy systemsLinks to an external site. is an exceedingly common field in the Computer Science discipline.
-
-As an architecture evolves, the developer must choose to either deal with out-of-date architecture components intermixing with their newer, streamlined techniques to allow backwards compatibility, or abandon (obsolete, deprecate) some parts of the older architecture. This can put companies and engineers into a conundrum because they want the improvements from the new system, but many of their systems will cease to function if they are dependent on those deprecated capabilities, and they’ll have to rework and refactor to compensate. There is, of course, another choice - to move to an entirely new architecture whose strengths meet the needs of the system.
-
-## QA
-
-### Why to learn Postfix?
-
-- it helps understand how the Intel IA-32 Floating Point Unit (FPU) works
+- `add` aka. operation code/instruction/opcode/operator
+- `a, b, c` aka. operands/arguments
 
 ## Primary Architecture Components
 
@@ -113,6 +102,10 @@ For example, to read from memory you would place the memory address to be read f
 
 - Benefits of little-endian byte ordering
     - Simpler typecasting, quick even/odd parity checks, arithmetic function optimization.
+
+## QA
+
+- [See QA](qa.md)
 
 ## References
 
