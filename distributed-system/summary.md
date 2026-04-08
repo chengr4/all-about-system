@@ -1,5 +1,26 @@
 # Summary
 
+## 20260407
+
+> #LogicalClock #LamportTimestamp #VectorClock #NTP #Causality #ConcurrentEvents #ClockOffset
+
+1. **邏輯時鐘與因果關係 (Logical Clocks & Causality)**
+    *   **核心理念**：在異步分散式系統中，實體時鐘難以同步，改用「Happens-before ($\to$)」關係定義事件順序。
+    *   **蘭伯特時間戳記 (Lamport Timestamps)**：使用單一整數計數器。優點是空間小，缺點是無法辨識並行 (Concurrent) 事件（即 $L(a) < L(b)$ 不代表 $a \to b$）。
+    *   **向量時鐘 (Vector Clocks)**：每個行程維護一個向量。能精確識別因果關係與並行事件，但空間複雜度隨行程數 $N$ 線性增加。
+
+2. **NTP (Network Time Protocol) 原理**
+    *   **階層架構**：採用樹狀結構（Primary/Secondary/Tertiary Servers），透過階層傳遞精確時間。
+    *   **偏移量計算**：透過交換四個時間戳記（$ts1, tr1, ts2, tr2$），計算估計偏移量 $o = (tr1 - ts1 + ts2 - tr2) / 2$。
+    *   **真實偏移量 (oreal) 與誤差**：`oreal` 是理論上的真實差距。NTP 誤差受網路往返時間 (RTT) 影響，最大誤差範圍為 $\pm RTT/2$。
+
+3. **專案中的時間處理實踐**
+    *   **Memberlist**：實作了蘭伯特邏輯時鐘，確保在不依賴外部 NTP 的情況下達成成員狀態更新的一致性。
+    *   **TiKV**：極度依賴時間同步以維持分散式事務。若本地時鐘與 PD 的 TSO (Timestamp Oracle) 偏差過大，會觸發 `MaxTimestampNotSynced` 錯誤以防止一致性破壞。
+
+
+
+
 ## 20260402
 
 > #3PC #2PC #NonBlocking #PreCommit #FailureAnalysis

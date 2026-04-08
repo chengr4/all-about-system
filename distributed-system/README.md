@@ -4,6 +4,8 @@ A distributed system is a collection of entities, each of which is autonomous, p
 
 > Entity: a process on a device (PC, PDA)
 
+- They all have independent clocks
+
 
 ## 2 Phase Commit
 
@@ -11,6 +13,8 @@ A distributed system is a collection of entities, each of which is autonomous, p
 
 - 2PC 是一個強同步協議。在事務執行的全程中，所有的參與者都需要佔用資源鎖
 - 2PC 裡，如果協調者掛了，大家就只能原地發呆。
+
+
 
 ## 3 Phase Commit
 
@@ -20,3 +24,4 @@ A distributed system is a collection of entities, each of which is autonomous, p
 
 - 3PC 依賴同步網路與可靠超時假設
 - **重點**：在 3PC 中，若協調者故障且存活節點都尚未進入 Pre-Commit，則可安全地集體 Abort。若存活節點已進入 Pre-Commit，則可在超時後依終止規則推進至 Commit。
+- 
