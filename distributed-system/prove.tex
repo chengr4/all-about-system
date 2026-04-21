@@ -1,0 +1,56 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage{amsfonts, amssymb, amsmath}
+\usepackage{fullpage}
+\usepackage{parskip} % skip a line instead of indenting
+% \usepackage{graphicx} % for inserting images
+\usepackage{amsthm}
+\usepackage{xcolor}
+\usepackage{tikz} % for plot
+
+\newcommand{\remark}[1]{
+    $>$ {\color{blue} #1}
+}
+
+\begin{document}
+
+\section*{Gossip Principle Analysis}
+
+Imagine the network as a population of $n+1$ individuals:
+\begin{itemize}
+    \item $y$ (Infected): Nodes that have received the information.
+    \item $x$ (Uninfected): Nodes that have not yet received the information
+    \item $x + y = n + 1$: The total population remains constant.
+    \item $\beta$ (Contact Rate): The probabillity that two nodes meet and the message is transmitted.
+\end{itemize}
+
+Init $t = 0$: Only 1 node knows the news ($y_0$ = 1), and $n$ nodes are unaware ($x_0$ = $n$).
+
+We wan to know
+
+\[\frac{dx}{dt} = -\beta xy\]
+
+Why $-\beta xy$?
+
+First, any pair $(x, y)$ that meets will result in a message transmission. 
+There are totally $xy$ possible pairs and each pair has a $\beta$ chance to transmit the message; 
+the negative sign indicates that $x$ should decrease over time.
+
+\[\Rightarrow y = \frac{n+1}{1 + n \cdot e^{-\beta(n+1)t}} \quad \text{(S curve)}\]
+
+However, In a Gossip protocal, we use ``active selection'' rather than ``random collision'':
+
+Each node randomly pick $b$ targets every round (aka. Fan-out). Since there are $n$ potential targets, the contact rate is $\beta \approx \frac{b}{n}$. 
+According to the most powerful feature of the Gossip protocol, the time required for informantion to disseminate across the entire network is $O(\log n)$, 
+we set time as $t = c\log n$ (where $c$ is a constant).
+
+\[\Rightarrow y \approx \frac{n+1}{1 + n \cdot n^{-bc}} = \frac{n+1}{1 + n^{1-bc}}\]
+
+
+Key Takeaways:
+
+\begin{enumerate}
+    \item Efficiency: Reaches the entire network in $O(\log n)$ rounds.
+    \item Scalability: Each node carries a constant load of $b$ messages per round, regardless of network size.
+\end{enumerate}
+
+\end{document}
