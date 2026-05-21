@@ -1,0 +1,271 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage{amsfonts, amssymb, amsmath}
+\usepackage{fullpage}
+\usepackage{parskip} % skip a line instead of indenting
+% \usepackage{graphicx} % for inserting images
+\usepackage{amsthm}
+\usepackage{xcolor}
+\usepackage{tikz} % for plot
+
+\newcommand{\remark}[1]{
+    $>$ {\color{blue} #1}
+}
+
+\begin{document}
+
+\section*{Distributed Atomic Commit}
+
+\textbf{Why is a 1-phase commit protocol (or naïve protocol), where a coordinator simply asks participants to either commit or abort a transaction,
+not sufficient for distributed atomic commit?}
+
+The key problem of 1-phase is that it does not allow participants to make a unilateral decision (a participant itself decides) to abort the transaction in case of failure; the participants might have local deadlock or maybe use optimistic concurrency control.
+
+1PC lacks voting phase $\Rightarrow$ Consistency is not guaranteed.
+
+\textbf{How does the 2-phase commit protocol improve upon the 1-phase commit (or naïve protocol).}
+
+The main improvement of 2-phase commit is that it introduces a voting phase. 
+In the voting phase, if any participant votes to abort, the coordinator will decide to abort the transaction.
+
+\textbf{A participant P in 2-phase commit protocol ``wakes-up'' into ``READY'' state after crashing. To decide whether to abort or commit the transaction P queries another participant Q about its state. 
+If Q responds back with ``INIT'' what should P do and why?}
+
+In 2PC, to achieve global commit, all participants must vote to commit; the state of all participants must at lease be in the ``READY'' state. 
+In this case, since Q is in the ``INIT'' state, it means that Q has not even received the \texttt{canCommit} message from the coordinator, which means the coordinator must not have decided to commit the transaction. 
+In order to satisfy atomicity, P must abort the transaction.
+
+\textbf{What is the problem with 2-phase commit protocol that 3-phase commit protocol is designed to avoid? Please explain.}
+
+The overall problem with 2PC is that it is synchronous blocking. If both the coordinator and a participant crash at the same time, 
+or After participants have voted ``Yes'' but could not receive the final decision from the coordinator, participants will be blocked in the ``READY'' state, waiting for the coordinator to send the final decision.
+
+3PC introduces ``Pre-commit'' stage. Participants can communicate with each other to determine the final decision, even if the coordinator crashes.
+
+\section*{Time and Ordering}
+
+\textbf{A clock is reading 12:33:57.0 (hr:min:sec) when it is discovered to be 3 seconds fast. Explain why it is undesirable to set it back to the right time at that point and show (numerically) how it should be adjusted so as to be correct after 6 seconds has elapsed (gone by).}
+
+Setting a clock back violates the monotonicity property, which is important in distributed systems.
+
+For eample, according to Couloris page 600, the \texttt{make} tool compares modifiation dates of source files and object files. 
+If a clock is set back, a newly modifed file might be older than the existing compiled object file, 
+which causes \texttt{make} to skip necessary recompilation and cause build errors.
+
+\remark{$\Rightarrow$ Clocks should only advance forward to maintain a consistent logical flow of time.}
+
+How to fix? The best way is to slow down the clock rate so that real time can catch up with the clock.
+
+Current status:
+
+\begin{itemize}
+    \item Local Clock: 12:33:57.0
+    \item Real Time: 12:33:54.0
+    \item Current Skew: 3 seconds
+\end{itemize}
+
+Goal: 
+
+\begin{itemize}
+    \item Elapsed Real Time: 6 seconds
+    \item Target Real Time: 12:33:54.0 + 6 seconds = 12:34:00.0
+    \item Target Local Clock: 12:34:00.0 $\Rightarrow$ We need the software clock to advance 3 seconds in the same duration that real time advances 6 seconds.
+\end{itemize}
+
+\[\text{Software Clock Rate} = \frac{3}{6} = 0.5\]
+
+\textbf{A client attempts to synchronize with a time server. It records the round-trip times and timestamps returned by the server in the table below.}
+
+\begin{center}
+\begin{tabular}{|c|c|}
+\hline
+Round-trip Time (ms) & Server Clock (hh:mm:ss) \\ \hline
+24 & 12:43:33.456 \\ \hline
+28 & 12:43:35.235 \\ \hline
+22 & 12:43:36.124 \\ \hline
+\end{tabular}
+\end{center}
+
+\textbf{a) Which of the times in the table below should it use to set its clock and why? What should it set its clock to? What is the estimated accuracy w.r.t to server's clock?}
+
+\[\text{Max Error} = \frac{RTT - min_1 - min_2}{2}\]
+
+Since the same client server pair should have the same $min_1$ and $min_2$, the client should choose the one with the smallest RTT to minimize the error $\Rightarrow RTT = 22ms$.
+
+\[T_{set} = T_{server} + \frac{RTT + min_2 - min_1}{2} = 12:43:36.124 + \frac{22}{2} = \mathbf{12:43:36.135}\]
+
+\[T_{server} \pm \frac{22ms}{2} = \mathbf{T_{server} \pm 11ms}\]
+
+\textbf{b) If minimum time to send or receive a message from the server is known to be at least 8ms, does your answer change? Why?}
+
+According to accuracy formula $\text{Max Error} = \frac{RTT - min_1 - min_2}{2}$, we still need to pick the smallest RTT to minimize the error.
+
+\textbf{If in problem 2 if it is required to sync to within 1ms of the server, is that feasible? Explain your answer.}
+
+\[\text{Max Error} = \frac{RTT - min_1 - min_2}{2} = \frac{RTT - 8 - 8}{2} \le 1\]
+\[\Rightarrow RTT \le 18 (Impossible)\]
+
+\textbf{By considering a chain of zero or more messages connecting events $e$ and $e'$, and using induction, show that $e \to e'$ implies $L(e) \le L(e')$, where $L(e)$ is the Lamport timestamp of event $e$.}
+
+\remark{Zero message aka. only one process, no intercommunication between processes}
+
+Base Case: $n=1 \Rightarrow e \rightarrow e'$ happens directly.
+
+\begin{itemize}
+    \item Case 1: $e$ and $e'$ are in the same process. According to HB1 and LC1, Before $e'$ happens, $L := L + 1$. $\therefore L(e) < L(e')$ is true.
+    \item Case 2: $e$ and $e'$ are in different processes. According to HB2 and LC2, $L(e') = \max(L_{local}, L(e)) + 1$ and $\max(L_{local}, L(e)) \ge L(e) \Rightarrow L(e') \ge L(e) + 1$. $\therefore L(e) < L(e')$ is true.
+\end{itemize}
+
+Inductive Hypothesis: Assume when casual chain of length $n=k$, $L(e) < L(e_k)$ is true.
+
+Inductive Step:
+
+Consider a casual chain of length $n=k+1$: $e \rightarrow \dots \rightarrow e_k \rightarrow e'$.
+
+By the inductive hypothesis, $L(e) < L(e_k)$.
+Now consider the final relation $e_k \rightarrow e'$. By HB1/HB2 and LC1/LC2, it follows that $L(e_k) < L(e')$.
+Combining $L(e) < L(e_k)$ and $L(e_k) < L(e')$, we obtain $L(e) < L(e')$.
+Hence, $L(e) \le L(e')$.
+
+
+\textbf{Show that $V_j[i] \le V_i[i]$ where $V_i$ is vector clock at process $i$.}
+
+According to the vector clock update rule 2, only process $p_i$ has the authority to increment its own vector clock at index $i$ ($V_i[i]$), 
+while any other process $p_j$ can only update $V_j[i]$ by receiving a message and $\max(V_i[i], V_j[i])$. 
+Therefore, $V_j[i]$ can never exceed $V_i[i]$ and $V_j[i] \le V_i[i]$ must be true.
+
+\textbf{Show that $e \to e'$ implies $V(e) \le V(e')$.}
+
+The definition of $V(e) \le V(e')$: $V \le V'$ if and only if $V[i] \le V'[i]$ for all $i \in \{1, \dots, N\}$.
+
+Vector Update Rules:
+
+\begin{enumerate}
+    \item Local/Send Event at $P_i$: $V_i[i] = V_i[i] + 1$
+    \item Receive Event at $P_i$ from $P_j$: $V_i[k] = \max(V_i[k], V_j[k])$ for all $k \in \{1, \dots, N\}$, and then $V_i[i] = V_i[i] + 1$
+\end{enumerate}
+
+Base Case: $n=1$
+
+\begin{itemize}
+    \item Case 1 (Same Process): Since $e$ and $e'$ occur in process $P_i$ and $e$ happens before $e'$. According to the rules, 
+    $P_i$ increments $V_i[i]$ at least once between $e$ and $e'$. Thus, $V(e) \le V(e')$ is true.
+    \item Case 2 (Message Passing): $e$ is the sending of a message by $P_i$, and $e'$ is the receipt of that same message by $P_j$. 
+    The message carries $V(e)$. At the receiver $P_j$, the rule $V_j[k] = \max(V_j[k], V(e)[k])$ ensure that every component of the new vector $V(e') \ge$ the corresponding component of $V(e)$. $\therefore V(e) \le V(e')$ is true.
+\end{itemize}
+
+Inductive Hypothesis: Assume for a causal chain of length $k$, $e \to e_k$ implies $V(e) \le V(e_k)$.
+
+Inductive Step: Consider a chain of length $k+1$: $e \to \dots \to e_k \to e'$.
+
+\begin{enumerate}
+    \item By the hyothesis, we have $V(e) \le V(e_k)$
+    \item From the base case, the single step $e_k \to e'$ implies $V(e_k) \le V(e')$.
+\end{enumerate}
+
+Combining the two, we have $V(e) \le V(e_k) \le V(e')$, which implies $V(e) \le V(e')$.
+
+\textbf{Using result $V_j[i] \le V_i[i]$ where $V_i$ is vector clock at process $i$, show that if $e$ and $e'$ are concurrent that neither $V(e) \le V(e')$ nor $V(e') \le V(e)$. Thus show that if $V(e) < V(e')$ then $e \to e'$.}
+
+1. Proof: If $e \parallel e'$, then neither $V(e) \le V(e')$ nor $V(e') \le V(e)$.
+
+If $e \parallel e' \Rightarrow e \not\to e'$,
+
+\[\therefore V(e')[i] < V(e)[i]\]
+
+Since one component is strictly smaller, $V(e) \not\le V(e')$ must be true.
+
+Similarly, if $e \parallel e'$, then $e' \not\to e$. The information of event $e'$ has not reached $P_i$ at the time of $e$. 
+\[\therefore V(e)[i] < V(e')[i]\]
+
+Since one component is strictly smaller, $V(e') \not\le V(e)$ must be true.
+
+\hrule
+
+\remark{For following questions, see figures in original PDF file.}
+
+\textbf{I. Mark one pair of events that are concurrent with each other.}
+
+\textbf{II. Mark one pair of events that are concurrent with each other.}
+
+\textbf{III. Identify an event at process P2 that happens before an event at P1.}
+
+\textbf{IV. Mark all Lamport timestamps on this figure for all events. All processes start with zero timestamps.}
+
+\textbf{V. Mark all vector timestamps on this figure for all events. All processes start with zero timestamps.}
+
+\textbf{VI. Mark all Lamport timestamps on this figure for all events. All processes start with zero timestamps.}
+
+\textbf{VII. Mark all vector timestamps on this figure for all events. All processes start with zero timestamps.}
+
+\section*{Gossip-based information dissemination, Failure Detection, and Group Membership I}
+
+\subsection*{In a modified ring-based heart-beating protocol, every process $p_i$ picks $k$ other process at random in the beginning and asks them to send their heartbeats to it ($p_i$) directly.}
+
+\textbf{a. Does this protocol provide completeness? If Yes, provide an informal proof. If No, provide a counter example.}
+
+No. ``Completeness'' requiress that every failure node is eventually detected by every non-faulty process. In this modified protocol, 
+each process $p_i$ only monitors a fixed set of $k$ processes. Since the heartbeat are sent directly to $p_i$, and is no mention of information sharing between nodes, $p_i$ only knows about the status of its chosen $k$  targets..
+
+Counter-exmaple: Suppose there are $N=100$ nodes and $k=5$. $p_1$ monitors $p_2, p_3, p_4, p_5, p_6$. If $p_7$ crashes, 
+$p_1$ will never receive a notification or detect this failure because it is not monitoring $p_{10}$ and no other process is passing that information to $p_1$. Thus, completeness is not satisfied.
+
+\textbf{b. Does this protocol provide Accuracy? If Yes, provide an informal proof. If No, provide a counter example and state what level of Accuracy does this protocol provide.}
+
+No. Accuracy requires that no non-faulty node is incorrectly suspected of failing. 
+This protocol relies on timeouts. \textbf{In an asynchronous system or a lossy network}, a heartbeat might arrive after the timeout period or not arrive at all, \textbf{even if the sender is still alive}.
+
+Counter-example: Node $p_j$ is healthy, but the network path between $p_j$ and $p_i$ is heavily congested. The heartbeat message from $p_j$ is delayed and arrives at $p_i$ after the timeout. 
+$p_i$ will incorrectly flag $p_j$ as ``failed'' which is a false positive.
+
+\textbf{What are the 4 desirable properties of distributed failure detectors? Is it possible to provide all 4 properties in lossy networks?}
+
+\begin{enumerate}
+    \item Completeness: Every failed node is eventually detected by all non-faulty nodes.
+    \item Accuracy: There are no mistaken detections.
+    \item Speed:The time it takes from the occurrence of a failure to its first detection should be as short as possible.
+    \item Scalability: The protocol should handle a large number of processes without overwhelming the network or individual nodes.
+\end{enumerate}
+
+No. Based on the research by Chandra and Toueg, it is mathematically impossible to provide both perfect completeness and perfect accuracy simultaneously in a lossy network.
+
+\textbf{In gossip-based failure detection why do we need to maintain two time thresholds - $T_{Fail}$ and $T_{Cleanup}$? How should one set the value of $T_{Cleanup}$ and why?}
+
+\remark{Hint: see the GOSSIP paper in the reading list}
+
+We need two thresholds to prevent the ghosting problem of failed members. If a node $A$ detects node $B$ had failed and deletes it immediately, 
+it might later receive an \textbf{old} heartbeat of $B$ from another node $C$ who has not detected $B$'s failure yet. 
+Node $A$ would then mistakenly re-add $B$ to its membership list as a new member. 
+The $T_{Cleanup}$ threshold acts as a ``buffer'' where the failed record is kept (but not udpated) to ensure old gossip messages about that node (here $B$) are ignored.
+
+And the Van Renesse paper suggests $T_{Cleanup} = 2 \times T_{Fail}$
+
+The first $T_{Fail}$ ensures that the failed node's last heartbeat has had enough time to propagate to every healthy node in the ntetwork. 
+The second $T_{Fail}$ ensures that even the last node to receive that heartbeat has waited long enough to independenrtly delcare the member as failed.
+
+\textbf{In gossip-based failure detection what happens to $P_{mistake}$ (false positive rate) as $T_{fail}$, $T_{cleanup}$ is increased? Explain your answer.}
+
+As $T_{fail}$ and $T_{cleanup}$ are increased, $P_{mistake}$ decreases. 
+This is because of the fundamental trade-off between speed and accuracy. by waiting longer (increasing the thresholds), the system becomes more conservative and less likely to "wrongly accuse" a healthy node of failing, thereby reducing $P_{mistake}$. 
+The cost of this improved accuracy is a slower detection speed.
+
+\textbf{There are $N$ processes and it is guaranteed that there will be no more than $N/3$ failures. Design a heart-beat protocol that guarantees completeness with minimum memory usage at the processes.}
+
+Only one failure can be reliably detected in a specific segment of the ring.
+
+[Wait for the right answer]
+
+\textbf{In a ring-based heart-beating protocol (lecture 4, slide 19) how many simultaneous failures can be detected and how does that depend on parameters of the protocol?}
+
+[Wait for the right answer]
+
+\textbf{In a Gossip protocol with $N$ processes, each process only maintains a membership list of size $k$. The $k$ members at each process are selected uniformly at random across the entire group. Each message is gossiped to $m$ randomly selected neighbors (from the membership list), where $m < k$, and $m = O(\log(N))$, with the latter needed to ensure spread of gossip. It is argued that the overall ``behavior'' of this protocol (in terms of dissemination time of gossips, etc.) is the same as in the case where all processes might have had full membership lists (known everyone in the group), and each gossip was sent to $m$ other processes. Is this argument right? If yes, then give a proof. If no, show why.}
+
+Right.
+
+[Wait for the right answer]
+
+\textbf{Compute an expression for the number of infected nodes after each infection round when using i) push based gossip and ii) pull based gossip (similar to the expression on Slide 22, Lecture 2). Compare the infection rates and comment on their speed of infection -  that is which process is faster and when?}
+
+
+
+\end{document}
